@@ -17,11 +17,12 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(book, index) in books" :key="index">
+            <tr v-for="(book, index) in books" :key="index"
+            :class="[{ 'bg-success': book.read }, errorClass]">
               <td>{{ book.title }}</td>
               <td>{{ book.author }}</td>
               <td>
-                <span v-if="book.read">Yes</span>
+                <span v-if="book.read" >Yes</span>
                 <span v-else>No</span>
               </td>
               <td>
@@ -135,7 +136,7 @@ export default {
         read: [],
       },
       message: '',
-      showMessage: false,
+      errorClass: 'bg-primary',
     };
   },
   components: {
@@ -246,9 +247,14 @@ export default {
     onDeleteBook(book) {
       this.removeBook(book.id);
     },
+    checkclass(book) {
+      this.removeBook(book.id);
+    },
   },
   created() {
     this.getBooks();
+    // this.timer = setInterval(this.getBooks, 10000);
+    // clearInterval(this.timer);
   },
 };
 </script>

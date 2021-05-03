@@ -5,7 +5,7 @@ import uuid
 BOOKS = [
     {
         'id': uuid.uuid4().hex,
-        'title': 'On the Road',
+        'title': '1000',
         'author': 'Jack Kerouac',
         'read': True
     },
