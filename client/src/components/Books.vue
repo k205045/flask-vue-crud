@@ -2,17 +2,24 @@
   <div class="container">
     <div class="row">
       <div class="col-sm-10">
-        <h1>Books</h1>
+        <h1>Keyence monitor</h1>
         <hr><br><br>
         <alert :message=message v-if="showMessage"></alert>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.book-modal>Add Book</button>
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input v-model="addr" class="form-control" placeholder="Ex:B01">
+            <span class="input-group-btn">
+              <button class="btn btn-secondary"
+              type="button" @click="onSubmit(addr)">新增暫存器</button>
+            </span>
+          </div>
+        </div>
         <br><br>
         <table class="table table-hover">
           <thead>
             <tr>
-              <th scope="col">Title</th>
-              <th scope="col">Author</th>
-              <th scope="col">Read?</th>
+              <th scope="col">暫存器</th>
+              <th scope="col">狀態</th>
               <th></th>
             </tr>
           </thead>
@@ -20,7 +27,7 @@
             <tr v-for="(book, index) in books" :key="index"
             :class="[{ 'bg-success': book.read }, errorClass]">
               <td>{{ book.title }}</td>
-              <td>{{ book.author }}</td>
+              <!-- <td>{{ book.author }}</td> -->
               <td>
                 <span v-if="book.read" >Yes</span>
                 <span v-else>No</span>
@@ -45,7 +52,7 @@
         </table>
       </div>
     </div>
-    <b-modal ref="addBookModal"
+    <!-- <b-modal ref="addBookModal"
           id="book-modal"
           title="Add a new book"
           hide-footer>
@@ -112,7 +119,7 @@
       <b-button type="submit" variant="primary">Update</b-button>
       <b-button type="reset" variant="danger">Cancel</b-button>
     </b-form>
-  </b-modal>
+  </b-modal> -->
   </div>
 </template>
 
@@ -159,7 +166,7 @@ export default {
       axios.post(path, payload)
         .then(() => {
           this.getBooks();
-          this.message = 'Book added!';
+          this.message = 'addr added!';
           this.showMessage = true;
         })
         .catch((error) => {
@@ -177,14 +184,12 @@ export default {
       this.editForm.author = '';
       this.editForm.read = [];
     },
-    onSubmit(evt) {
-      evt.preventDefault();
-      this.$refs.addBookModal.hide();
+    onSubmit(addr) {
+      // this.$refs.addBookModal.hide();
       let read = false;
       if (this.addBookForm.read[0]) read = true;
       const payload = {
-        title: this.addBookForm.title,
-        author: this.addBookForm.author,
+        title: addr,
         read, // property shorthand
       };
       this.addBook(payload);
