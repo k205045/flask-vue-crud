@@ -25,11 +25,12 @@
           </thead>
           <tbody>
             <tr v-for="(book, index) in books" :key="index"
-            :class="[{ 'bg-success': book.read }, errorClass]">
+            :class="[{ 'bg-success': book.bool , 'bg-info':book.str }, errorClass]">
               <td>{{ book.title }}</td>
-              <!-- <td>{{ book.author }}</td> -->
+              <!-- <td>{{ book.myvalue }}</td> -->
               <td>
-                <span v-if="book.read" >Yes</span>
+                <span v-if="book.bool" >Yes</span>
+                <span v-else-if="book.str" >{{book.myvalue}}</span>
                 <span v-else>No</span>
               </td>
               <td>
@@ -67,25 +68,25 @@
                       placeholder="Enter title">
         </b-form-input>
       </b-form-group>
-      <b-form-group id="form-author-group"
-                    label="Author:"
-                    label-for="form-author-input">
-          <b-form-input id="form-author-input"
+      <b-form-group id="form-myvalue-group"
+                    label="myvalue:"
+                    label-for="form-myvalue-input">
+          <b-form-input id="form-myvalue-input"
                         type="text"
-                        v-model="addBookForm.author"
+                        v-model="addBookForm.myvalue"
                         required
-                        placeholder="Enter author">
+                        placeholder="Enter myvalue">
           </b-form-input>
         </b-form-group>
-      <b-form-group id="form-read-group">
-        <b-form-checkbox-group v-model="addBookForm.read" id="form-checks">
-          <b-form-checkbox value="true">Read?</b-form-checkbox>
+      <b-form-group id="form-bool-group">
+        <b-form-checkbox-group v-model="addBookForm.bool" id="form-checks">
+          <b-form-checkbox myvalue="true">bool?</b-form-checkbox>
         </b-form-checkbox-group>
       </b-form-group>
       <b-button type="submit" variant="primary">Submit</b-button>
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
-  </b-modal>
+  </b-modal> -->
   <b-modal ref="editBookModal"
           id="book-update-modal"
           title="Update"
@@ -101,25 +102,25 @@
                       placeholder="Enter title">
         </b-form-input>
       </b-form-group>
-      <b-form-group id="form-author-edit-group"
-                    label="Author:"
-                    label-for="form-author-edit-input">
-          <b-form-input id="form-author-edit-input"
+      <b-form-group v-if="editForm.str" id="form-myvalue-edit-group"
+                    label="myvalue:"
+                    label-for="form-myvalue-edit-input">
+          <b-form-input id="form-myvalue-edit-input"
                         type="text"
-                        v-model="editForm.author"
+                        v-model="editForm.myvalue"
                         required
-                        placeholder="Enter author">
+                        placeholder="Enter myvalue">
           </b-form-input>
         </b-form-group>
-      <b-form-group id="form-read-edit-group">
-        <b-form-checkbox-group v-model="editForm.read" id="form-checks">
-          <b-form-checkbox value="true">Read?</b-form-checkbox>
+      <b-form-group v-if="!editForm.str" id="form-bool-edit-group">
+        <b-form-checkbox-group v-model="editForm.bool" id="form-checks">
+          <b-form-checkbox myvalue="true">status </b-form-checkbox>
         </b-form-checkbox-group>
       </b-form-group>
       <b-button type="submit" variant="primary">Update</b-button>
       <b-button type="reset" variant="danger">Cancel</b-button>
     </b-form>
-  </b-modal> -->
+  </b-modal>
   </div>
 </template>
 
@@ -133,14 +134,15 @@ export default {
       books: [],
       addBookForm: {
         title: '',
-        author: '',
-        read: [],
+        bool: [],
+        str: [],
+        myvalue: '',
       },
       editForm: {
-        id: '',
         title: '',
-        author: '',
-        read: [],
+        bool: [],
+        str: [],
+        myvalue: '',
       },
       message: '',
       errorClass: 'bg-primary',
@@ -177,20 +179,22 @@ export default {
     },
     initForm() {
       this.addBookForm.title = '';
-      this.addBookForm.author = '';
-      this.addBookForm.read = [];
+      this.addBookForm.myvalue = '';
+      this.addBookForm.bool = [];
+      this.addBookForm.str = [];
       this.editForm.id = '';
       this.editForm.title = '';
-      this.editForm.author = '';
-      this.editForm.read = [];
+      this.editForm.myvalue = '';
+      this.editForm.bool = [];
+      this.editForm.str = [];
     },
     onSubmit(addr) {
       // this.$refs.addBookModal.hide();
-      let read = false;
-      if (this.addBookForm.read[0]) read = true;
+      let bool = false;
+      if (this.addBookForm.bool[0]) bool = true;
       const payload = {
         title: addr,
-        read, // property shorthand
+        bool, // property shorthand
       };
       this.addBook(payload);
       this.initForm();
@@ -206,14 +210,13 @@ export default {
     onSubmitUpdate(evt) {
       evt.preventDefault();
       this.$refs.editBookModal.hide();
-      let read = false;
-      if (this.editForm.read[0]) read = true;
       const payload = {
         title: this.editForm.title,
-        author: this.editForm.author,
-        read,
-      };
-      this.updateBook(payload, this.editForm.id);
+        bool: this.editForm.bool,
+        str: this.editForm.str,
+        myvalue: this.editForm.myvalue,
+      }
+      this.updateBook(payload ,this.editForm.id);
     },
     updateBook(payload, bookID) {
       const path = `http://localhost:5000/books/${bookID}`;
@@ -258,8 +261,8 @@ export default {
   },
   created() {
     this.getBooks();
-    // this.timer = setInterval(this.getBooks, 10000);
-    // clearInterval(this.timer);
+    this.timer = setInterval(this.getBooks, 1000);
+    clearInterval(this.timer);
   },
 };
 </script>
