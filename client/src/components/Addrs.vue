@@ -7,7 +7,8 @@
         <alert :message=message v-if="showMessage"></alert>
         <div class="col-lg-6">
           <div class="input-group">
-            <input v-model="addr" class="form-control" placeholder="Ex:B01">
+            <input v-model="commit" class="form-control" placeholder="注釋">
+            <input v-model="addr" class="form-control" placeholder="暫存器名稱">
             <span class="input-group-btn">
               <button class="btn btn-secondary"
               type="button" @click="onSubmit(addr)">新增暫存器</button>
@@ -18,33 +19,34 @@
         <table class="table table-hover">
           <thead>
             <tr>
+              <th scope="col">注釋</th>
               <th scope="col">暫存器</th>
               <th scope="col">狀態</th>
               <th></th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(book, index) in books" :key="index"
-            :class="[{ 'bg-success': book.bool , 'bg-info':book.str }, errorClass]">
-              <td>{{ book.title }}</td>
-              <!-- <td>{{ book.myvalue }}</td> -->
+            <tr v-for="(addr, index) in addrs" :key="index"
+            :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
+              <td>{{ addr.commit }}</td>
+              <td>{{ addr.title }}</td>
               <td>
-                <span v-if="book.bool" >Yes</span>
-                <span v-else-if="book.str" >{{book.myvalue}}</span>
+                <span v-if="addr.bool" >Yes</span>
+                <span v-else-if="addr.str" >{{addr.myvalue}}</span>
                 <span v-else>No</span>
               </td>
               <td>
                 <button
                     type="button"
                     class="btn btn-warning btn-sm"
-                    v-b-modal.book-update-modal
-                    @click="editBook(book)">
+                    v-b-modal.addr-update-modal
+                    @click="editAddr(addr)">
                     Update
                 </button>
                 <button
                     type="button"
                     class="btn btn-danger btn-sm"
-                    @click="onDeleteBook(book)">
+                    @click="onDeleteAddr(addr)">
                     Delete
                 </button>
               </td>
@@ -53,9 +55,9 @@
         </table>
       </div>
     </div>
-    <!-- <b-modal ref="addBookModal"
-          id="book-modal"
-          title="Add a new book"
+    <!-- <b-modal ref="addAddrModal"
+          id="addr-modal"
+          title="Add a new addr"
           hide-footer>
     <b-form @submit="onSubmit" @reset="onReset" class="w-100">
     <b-form-group id="form-title-group"
@@ -63,7 +65,7 @@
                   label-for="form-title-input">
         <b-form-input id="form-title-input"
                       type="text"
-                      v-model="addBookForm.title"
+                      v-model="addAddrForm.title"
                       required
                       placeholder="Enter title">
         </b-form-input>
@@ -73,13 +75,13 @@
                     label-for="form-myvalue-input">
           <b-form-input id="form-myvalue-input"
                         type="text"
-                        v-model="addBookForm.myvalue"
+                        v-model="addAddrForm.myvalue"
                         required
                         placeholder="Enter myvalue">
           </b-form-input>
         </b-form-group>
       <b-form-group id="form-bool-group">
-        <b-form-checkbox-group v-model="addBookForm.bool" id="form-checks">
+        <b-form-checkbox-group v-model="addAddrForm.bool" id="form-checks">
           <b-form-checkbox myvalue="true">bool?</b-form-checkbox>
         </b-form-checkbox-group>
       </b-form-group>
@@ -87,11 +89,21 @@
       <b-button type="reset" variant="danger">Reset</b-button>
     </b-form>
   </b-modal> -->
-  <b-modal ref="editBookModal"
-          id="book-update-modal"
+  <b-modal ref="editAddrModal"
+          id="addr-update-modal"
           title="Update"
           hide-footer>
     <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+    <b-form-group id="form-title-edit-group"
+                  label="Commit:"
+                  label-for="form-title-edit-input">
+        <b-form-input id="form-title-edit-input"
+                      type="text"
+                      v-model="editForm.commit"
+                      required
+                      placeholder="Enter commit">
+        </b-form-input>
+      </b-form-group>
     <b-form-group id="form-title-edit-group"
                   label="Title:"
                   label-for="form-title-edit-input">
@@ -131,18 +143,20 @@ import Alert from './Alert';
 export default {
   data() {
     return {
-      books: [],
-      addBookForm: {
+      addrs: [],
+      addAddrForm: {
         title: '',
         bool: [],
         str: [],
         myvalue: '',
+        commit: '',
       },
       editForm: {
         title: '',
         bool: [],
         str: [],
         myvalue: '',
+        commit: '',
       },
       message: '',
       errorClass: 'bg-primary',
@@ -152,116 +166,119 @@ export default {
     alert: Alert,
   },
   methods: {
-    getBooks() {
-      const path = 'http://localhost:5000/books';
+    getAddrs() {
+      const path = 'http://localhost:5000/addrs';
       axios.get(path)
         .then((res) => {
-          this.books = res.data.books;
+          this.addrs = res.data.addrs;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
         });
     },
-    addBook(payload) {
-      const path = 'http://localhost:5000/books';
+    addAddr(payload) {
+      const path = 'http://localhost:5000/addrs';
       axios.post(path, payload)
         .then(() => {
-          this.getBooks();
+          this.getAddrs();
           this.message = 'addr added!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.log(error);
-          this.getBooks();
+          this.getAddrs();
         });
     },
     initForm() {
-      this.addBookForm.title = '';
-      this.addBookForm.myvalue = '';
-      this.addBookForm.bool = [];
-      this.addBookForm.str = [];
+      this.addAddrForm.title = '';
+      this.addAddrForm.myvalue = '';
+      this.addAddrForm.bool = [];
+      this.addAddrForm.str = [];
+      this.addAddrForm.commit = '';
       this.editForm.id = '';
       this.editForm.title = '';
       this.editForm.myvalue = '';
       this.editForm.bool = [];
       this.editForm.str = [];
+      this.editForm.commit = '';
     },
     onSubmit(addr) {
-      // this.$refs.addBookModal.hide();
+      // this.$refs.addAddrModal.hide();
       let bool = false;
-      if (this.addBookForm.bool[0]) bool = true;
+      if (this.addAddrForm.bool[0]) bool = true;
       const payload = {
         title: addr,
         bool, // property shorthand
       };
-      this.addBook(payload);
+      this.addAddr(payload);
       this.initForm();
     },
     onReset(evt) {
       evt.preventDefault();
-      this.$refs.addBookModal.hide();
+      this.$refs.addAddrModal.hide();
       this.initForm();
     },
-    editBook(book) {
-      this.editForm = book;
+    editAddr(addr) {
+      this.editForm = addr;
     },
     onSubmitUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
+      this.$refs.editAddrModal.hide();
       const payload = {
         title: this.editForm.title,
         bool: this.editForm.bool,
         str: this.editForm.str,
         myvalue: this.editForm.myvalue,
-      }
-      this.updateBook(payload ,this.editForm.id);
+        commit: this.editForm.commit,
+      };
+      this.updateAddr(payload, this.editForm.id);
     },
-    updateBook(payload, bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    updateAddr(payload, addrID) {
+      const path = `http://localhost:5000/addrs/${addrID}`;
       axios.put(path, payload)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book updated!';
+          this.getAddrs();
+          this.message = 'Addr updated!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getAddrs();
         });
     },
     onResetUpdate(evt) {
       evt.preventDefault();
-      this.$refs.editBookModal.hide();
+      this.$refs.editAddrModal.hide();
       this.initForm();
-      this.getBooks(); // why?
+      this.getAddrs(); // why?
     },
-    removeBook(bookID) {
-      const path = `http://localhost:5000/books/${bookID}`;
+    removeAddr(addrID) {
+      const path = `http://localhost:5000/addrs/${addrID}`;
       axios.delete(path)
         .then(() => {
-          this.getBooks();
-          this.message = 'Book removed!';
+          this.getAddrs();
+          this.message = 'Addr removed!';
           this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
           console.error(error);
-          this.getBooks();
+          this.getAddrs();
         });
     },
-    onDeleteBook(book) {
-      this.removeBook(book.id);
+    onDeleteAddr(addr) {
+      this.removeAddr(addr.id);
     },
-    checkclass(book) {
-      this.removeBook(book.id);
+    checkclass(addr) {
+      this.removeAddr(addr.id);
     },
   },
   created() {
-    this.getBooks();
-    this.timer = setInterval(this.getBooks, 1000);
+    this.getAddrs();
+    this.timer = setInterval(this.getAddrs, 1000);
     clearInterval(this.timer);
   },
 };

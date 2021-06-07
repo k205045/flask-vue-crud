@@ -7,27 +7,30 @@ import re
 rule = re.compile("B")
 rule1 = re.compile("DM")
 
-BOOKS = [
+ADDRS = [
     {
         'id': uuid.uuid4().hex,
-        'title': 'B03',
+        'title': 'B01',
         'bool': True,
         'str': False,
-        'myvalue' : ""
+        'myvalue' : "",
+        'commit': "01"
     },
     {
         'id': uuid.uuid4().hex,
         'title': 'B02',
         'bool': True,
         'str': False,
-        'myvalue' : ""
+        'myvalue' : "",
+        'commit': "02"
     },
     {
         'id': uuid.uuid4().hex,
-        'title': 'B01',
+        'title': 'B03',
         'bool': True,
         'str': False,
-        'myvalue' : ""
+        'myvalue': "",
+        'commit': "03"
     }
 ]
 
@@ -47,52 +50,54 @@ CORS(app)
 def ping_pong():
     return jsonify('pong!')
 
-@app.route('/books', methods=['GET', 'POST'])
-def all_books():
+@app.route('/addrs', methods=['GET', 'POST'])
+def all_addrs():
     response_object = {'status': 'success'}
     if request.method == 'POST':
         post_data = request.get_json()
-        BOOKS.append({
+        ADDRS.append({
             'id': uuid.uuid4().hex,
             'title': post_data.get('title'),
             'bool': post_data.get('bool'),
             'str': False,
-            'myvalue' : ""
+            'myvalue' : "",
+            'commit' : post_data.get('commit')
         })
         response_object['message'] = 'address added!'
     else:
-        for Book in BOOKS:
-            Booltype = rule.findall(Book['title'])
+        for Addr in ADDRS:
+            Booltype = rule.findall(Addr['title'])
             if len(Booltype) > 0:
-                status = tobool(socket.Get(Book['title']))
-                Book['bool'] = status
-                Book['str'] = False
-                Book['myvalue'] = ""
+                status = tobool(socket.Get(Addr['title']))
+                Addr['bool'] = status
+                Addr['str'] = False
+                Addr['myvalue'] = ""
                 print("Bool")
             else:
-                strtype = rule1.findall(Book['title'])
+                strtype = rule1.findall(Addr['title'])
                 if len(strtype) > 0:
-                    status = socket.Get(Book['title'],".U")
-                    Book['bool'] = False
-                    Book['str'] = True
-                    Book['myvalue'] = str(status)
+                    status = socket.Get(Addr['title'],".U")
+                    Addr['bool'] = False
+                    Addr['str'] = True
+                    Addr['myvalue'] = str(status)
 
-        response_object['books'] = BOOKS
+        response_object['addrs'] = ADDRS
     return jsonify(response_object)
 
-@app.route('/books/<book_id>', methods=['PUT', 'DELETE'])
-def single_book(book_id):
+@app.route('/addrs/<addr_id>', methods=['PUT', 'DELETE'])
+def single_addr(addr_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
         post_data = request.get_json()
-        # remove_book(book_id)
-        # BOOKS.append({
-        #     'id': uuid.uuid4().hex,
-        #     'title': post_data.get('title'),
-        #     'bool': post_data.get('bool'),
-        #     'str' : post_data.get('str'),
-        #     'value' : post_data.get('value'),
-        # })
+        remove_addr(addr_id)
+        ADDRS.append({
+            'id': uuid.uuid4().hex,
+            'title': post_data.get('title'),
+            'bool': post_data.get('bool'),
+            'str' : post_data.get('str'),
+            'value' : post_data.get('value'),
+            'commit' : post_data.get('commit')
+        })
         # print(post_data.get('title'))
         Booltype = rule.findall(post_data.get('title'))
         if len(Booltype) > 0:
@@ -105,14 +110,14 @@ def single_book(book_id):
         
         response_object['message'] = 'addr updated!'
     if request.method == 'DELETE':
-        remove_book(book_id)
+        remove_addr(addr_id)
         response_object['message'] = 'addr removed!'
     return jsonify(response_object)
     
-def remove_book(book_id):
-    for book in BOOKS:
-        if book['id'] == book_id:
-            BOOKS.remove(book)
+def remove_addr(addr_id):
+    for addr in ADDRS:
+        if addr['id'] == addr_id:
+            ADDRS.remove(addr)
             return True
     return False
 
