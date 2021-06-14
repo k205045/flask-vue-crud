@@ -7,11 +7,11 @@
         <alert :message=message v-if="showMessage"></alert>
         <div class="col-lg-6">
           <div class="input-group">
-            <input v-model="commit" class="form-control" placeholder="注釋">
+            <input v-model="commit1" class="form-control" placeholder="注釋">
             <input v-model="addr" class="form-control" placeholder="暫存器名稱">
             <span class="input-group-btn">
               <button class="btn btn-secondary"
-              type="button" @click="onSubmit(addr)">新增暫存器</button>
+              type="button" @click="onSubmit(addr, commit1)">新增暫存器</button>
             </span>
           </div>
         </div>
@@ -204,11 +204,12 @@ export default {
       this.editForm.str = [];
       this.editForm.commit = '';
     },
-    onSubmit(addr) {
+    onSubmit(addr, commit1) {
       // this.$refs.addAddrModal.hide();
       let bool = false;
       if (this.addAddrForm.bool[0]) bool = true;
       const payload = {
+        commit: commit1,
         title: addr,
         bool, // property shorthand
       };
@@ -279,7 +280,7 @@ export default {
   created() {
     this.getAddrs();
     this.timer = setInterval(this.getAddrs, 1000);
-    clearInterval(this.timer);
+    // clearInterval(this.timer);
   },
 };
 </script>

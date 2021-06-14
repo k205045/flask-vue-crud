@@ -3,40 +3,15 @@ from flask_cors import CORS
 from ConncectPLC import Mysocket as sock
 import uuid
 import re
+import json
 
 rule = re.compile("B")
 rule1 = re.compile("DM")
 
-ADDRS = [
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'B01',
-        'bool': True,
-        'str': False,
-        'myvalue' : "",
-        'commit': "01"
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'B02',
-        'bool': True,
-        'str': False,
-        'myvalue' : "",
-        'commit': "02"
-    },
-    {
-        'id': uuid.uuid4().hex,
-        'title': 'B03',
-        'bool': True,
-        'str': False,
-        'myvalue': "",
-        'commit': "03"
-    }
-]
-
+socket = sock("192.168.10.10",8501)
 # configuration
 DEBUG = True
-socket = sock("192.168.10.10",8501)
+
 # instantiate the app
 app = Flask(__name__)
 app.config.from_object(__name__)
@@ -44,6 +19,12 @@ app.config.from_object(__name__)
 # enable CORS
 CORS(app)
 
+try:
+    ADDRS = json.load(open( "data.json"))
+    if str(type(ADDRS)) == "<class 'NoneType'>":
+        ADDRS = []  
+except:
+    ADDRS = []
 
 # sanity check route
 @app.route('/ping', methods=['GET'])
@@ -113,7 +94,26 @@ def single_addr(addr_id):
         remove_addr(addr_id)
         response_object['message'] = 'addr removed!'
     return jsonify(response_object)
-    
+
+@app.route('/save', methods=['POST'])
+def Save_Setting():
+    data = ADDRS
+    file = 'data.json'
+    with open(file, 'w') as obj:
+        json.dump(data, obj)
+    return "True"
+
+@app.route('/load', methods=['POST'])
+def Load_Setting():
+    global ADDRS
+    try:
+        ADDRS = json.load( open( "data.json" ) )
+        if str(type(ADDRS)) == "<class 'NoneType'>":
+            ADDRS = []  
+    except:
+        ADDRS = []
+    return "True"
+
 def remove_addr(addr_id):
     for addr in ADDRS:
         if addr['id'] == addr_id:
@@ -137,4 +137,5 @@ def tostr(str):
             return "0"
 
 if __name__ == '__main__':
+
     app.run()
