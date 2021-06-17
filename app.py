@@ -8,7 +8,8 @@ import json
 rule = re.compile("B")
 rule1 = re.compile("DM")
 
-socket = sock("192.168.10.10",8501)
+socket = sock("192.168.5.88",8501)
+# socket = sock("127.0.0.1",5890)
 # configuration
 DEBUG = True
 
@@ -42,7 +43,8 @@ def all_addrs():
             'bool': post_data.get('bool'),
             'str': False,
             'myvalue' : "",
-            'commit' : post_data.get('commit')
+            'commit' : post_data.get('commit'),
+            'ReadOrWrite':post_data.get('ReadOrWrite')
         })
         response_object['message'] = 'address added!'
     else:
@@ -77,13 +79,14 @@ def single_addr(addr_id):
             'bool': post_data.get('bool'),
             'str' : post_data.get('str'),
             'value' : post_data.get('value'),
-            'commit' : post_data.get('commit')
+            'commit' : post_data.get('commit'),
+            'ReadOrWrite':post_data.get('ReadOrWrite')
         })
         # print(post_data.get('title'))
         Booltype = rule.findall(post_data.get('title'))
         if len(Booltype) > 0:
             socket.Send(post_data.get('title'), tostr(post_data.get('bool')))
-            print("bool1111111111111")
+            # print("bool1111111111111")
         else:
             strtype = rule1.findall(post_data.get('title'))
             if len(strtype) > 0:

@@ -1,17 +1,17 @@
 <template>
-  <div class="container">
+  <div class="container-fluid">
     <div class="row">
-      <div class="col-sm-10">
-        <!-- <h1>Keyence monitor</h1> -->
-        <hr><br><br>
-        <alert :message=message v-if="showMessage"></alert>
+      <div class="col-6">
+        <h2>Only Read</h2>
+        <br>
+        <!-- <alert :message=message v-if="showMessage"></alert> -->
         <div class="col-lg-6">
           <div class="input-group">
             <input v-model="commit1" class="form-control" placeholder="注釋">
             <input v-model="addr" class="form-control" placeholder="暫存器名稱">
             <span class="input-group-btn">
               <button class="btn btn-secondary"
-              type="button" @click="onSubmit(addr, commit1)">新增暫存器</button>
+              type="button" @click="onSubmit(addr, commit1, false)">新增暫存器</button>
             </span>
           </div>
         </div>
@@ -26,7 +26,60 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(addr, index) in addrs" :key="index"
+            <tr v-for="(addr, index) in addrs" :key="index" v-show="!addr.ReadOrWrite"
+            :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
+              <td>{{ addr.commit }}</td>
+              <td>{{ addr.title }}</td>
+              <td>
+                <span v-if="addr.bool" >Yes</span>
+                <span v-else-if="addr.str" >{{addr.myvalue}}</span>
+                <span v-else>No</span>
+              </td>
+              <td>
+                <!-- <button
+                    type="button"
+                    class="btn btn-warning btn-sm"
+                    v-b-modal.addr-update-modal
+                    @click="editAddr(addr)">
+                    Update
+                </button> -->
+                <button
+                    type="button"
+                    class="btn btn-danger btn-sm"
+                    @click="onDeleteAddr(addr)">
+                    Delete
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="col-6">
+        <h2>Read and Write</h2>
+        <br>
+        <!-- <alert :message=message v-if="showMessage"></alert> -->
+        <div class="col-lg-6">
+          <div class="input-group">
+            <input v-model="commit2" class="form-control" placeholder="注釋">
+            <input v-model="addr2" class="form-control" placeholder="暫存器名稱">
+            <span class="input-group-btn">
+              <button class="btn btn-secondary"
+              type="button" @click="onSubmit(addr2, commit2, true)">新增暫存器</button>
+            </span>
+          </div>
+        </div>
+        <br><br>
+        <table class="table table-hover">
+          <thead>
+            <tr>
+              <th scope="col">注釋</th>
+              <th scope="col">暫存器</th>
+              <th scope="col">狀態</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="(addr, index) in addrs" :key="index" v-show="addr.ReadOrWrite"
             :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
               <td>{{ addr.title }}</td>
@@ -55,84 +108,50 @@
         </table>
       </div>
     </div>
-    <!-- <b-modal ref="addAddrModal"
-          id="addr-modal"
-          title="Add a new addr"
-          hide-footer>
-    <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-    <b-form-group id="form-title-group"
-                  label="Title:"
-                  label-for="form-title-input">
-        <b-form-input id="form-title-input"
-                      type="text"
-                      v-model="addAddrForm.title"
-                      required
-                      placeholder="Enter title">
-        </b-form-input>
-      </b-form-group>
-      <b-form-group id="form-myvalue-group"
-                    label="myvalue:"
-                    label-for="form-myvalue-input">
-          <b-form-input id="form-myvalue-input"
+    <b-modal ref="editAddrModal"
+            id="addr-update-modal"
+            title="Update"
+            hide-footer>
+      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+      <b-form-group id="form-title-edit-group"
+                    label="Commit:"
+                    label-for="form-title-edit-input">
+          <b-form-input id="form-title-edit-input"
                         type="text"
-                        v-model="addAddrForm.myvalue"
+                        v-model="editForm.commit"
                         required
-                        placeholder="Enter myvalue">
+                        placeholder="Enter commit">
           </b-form-input>
         </b-form-group>
-      <b-form-group id="form-bool-group">
-        <b-form-checkbox-group v-model="addAddrForm.bool" id="form-checks">
-          <b-form-checkbox myvalue="true">bool?</b-form-checkbox>
-        </b-form-checkbox-group>
-      </b-form-group>
-      <b-button type="submit" variant="primary">Submit</b-button>
-      <b-button type="reset" variant="danger">Reset</b-button>
-    </b-form>
-  </b-modal> -->
-  <b-modal ref="editAddrModal"
-          id="addr-update-modal"
-          title="Update"
-          hide-footer>
-    <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
-    <b-form-group id="form-title-edit-group"
-                  label="Commit:"
-                  label-for="form-title-edit-input">
-        <b-form-input id="form-title-edit-input"
-                      type="text"
-                      v-model="editForm.commit"
-                      required
-                      placeholder="Enter commit">
-        </b-form-input>
-      </b-form-group>
-    <b-form-group id="form-title-edit-group"
-                  label="Title:"
-                  label-for="form-title-edit-input">
-        <b-form-input id="form-title-edit-input"
-                      type="text"
-                      v-model="editForm.title"
-                      required
-                      placeholder="Enter title">
-        </b-form-input>
-      </b-form-group>
-      <b-form-group v-if="editForm.str" id="form-myvalue-edit-group"
-                    label="myvalue:"
-                    label-for="form-myvalue-edit-input">
-          <b-form-input id="form-myvalue-edit-input"
+      <b-form-group id="form-title-edit-group"
+                    label="Title:"
+                    label-for="form-title-edit-input">
+          <b-form-input id="form-title-edit-input"
                         type="text"
-                        v-model="editForm.myvalue"
+                        v-model="editForm.title"
                         required
-                        placeholder="Enter myvalue">
+                        placeholder="Enter title">
           </b-form-input>
         </b-form-group>
-      <b-form-group v-if="!editForm.str" id="form-bool-edit-group">
-        <b-form-checkbox-group v-model="editForm.bool" id="form-checks">
-          <b-form-checkbox myvalue="true">status </b-form-checkbox>
-        </b-form-checkbox-group>
-      </b-form-group>
-      <b-button type="submit" variant="primary">Update</b-button>
-      <b-button type="reset" variant="danger">Cancel</b-button>
-    </b-form>
-  </b-modal>
+        <b-form-group v-if="editForm.str" id="form-myvalue-edit-group"
+                      label="myvalue:"
+                      label-for="form-myvalue-edit-input">
+            <b-form-input id="form-myvalue-edit-input"
+                          type="text"
+                          v-model="editForm.myvalue"
+                          required
+                          placeholder="Enter myvalue">
+            </b-form-input>
+          </b-form-group>
+        <b-form-group v-if="!editForm.str" id="form-bool-edit-group">
+          <b-form-checkbox-group v-model="editForm.bool" id="form-checks">
+            <b-form-checkbox myvalue="true">status </b-form-checkbox>
+          </b-form-checkbox-group>
+        </b-form-group>
+        <b-button type="submit" variant="primary">Update</b-button>
+        <b-button type="reset" variant="danger">Cancel</b-button>
+      </b-form>
+    </b-modal>
   </div>
 </template>
 
@@ -150,6 +169,7 @@ export default {
         str: [],
         myvalue: '',
         commit: '',
+        ReadOrWrite: [],
       },
       editForm: {
         title: '',
@@ -157,6 +177,7 @@ export default {
         str: [],
         myvalue: '',
         commit: '',
+        ReadOrWrite: [],
       },
       message: '',
       errorClass: 'bg-primary',
@@ -197,14 +218,16 @@ export default {
       this.addAddrForm.bool = [];
       this.addAddrForm.str = [];
       this.addAddrForm.commit = '';
+      this.addAddrForm.ReadOrWrite = [];
       this.editForm.id = '';
       this.editForm.title = '';
       this.editForm.myvalue = '';
       this.editForm.bool = [];
       this.editForm.str = [];
       this.editForm.commit = '';
+      this.editForm.ReadOrWrite = [];
     },
-    onSubmit(addr, commit1) {
+    onSubmit(addr, commit1, read) {
       // this.$refs.addAddrModal.hide();
       let bool = false;
       if (this.addAddrForm.bool[0]) bool = true;
@@ -212,6 +235,7 @@ export default {
         commit: commit1,
         title: addr,
         bool, // property shorthand
+        ReadOrWrite: read,
       };
       this.addAddr(payload);
       this.initForm();
@@ -233,6 +257,7 @@ export default {
         str: this.editForm.str,
         myvalue: this.editForm.myvalue,
         commit: this.editForm.commit,
+        ReadOrWrite: this.editForm.ReadOrWrite,
       };
       this.updateAddr(payload, this.editForm.id);
     },
