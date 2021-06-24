@@ -25,8 +25,9 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(addr, index) in addrs" :key="index" v-show="!addr.ReadOrWrite"
+          <draggable v-model="addrs" tag="tbody" animation="500"
+          chosen-class="chosen" @change=changeindex>
+            <tr v-for="addr in addrs" :key="addr.id" v-show="!addr.ReadOrWrite"
             :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
               <td>{{ addr.title }}</td>
@@ -51,7 +52,7 @@
                 </button>
               </td>
             </tr>
-          </tbody>
+          </draggable>
         </table>
       </div>
       <div class="col-6">
@@ -78,8 +79,9 @@
               <th></th>
             </tr>
           </thead>
-          <tbody>
-            <tr v-for="(addr, index) in addrs" :key="index" v-show="addr.ReadOrWrite"
+          <draggable v-model="addrs" tag="tbody" animation="500"
+          chosen-class="chosen" @change=changeindex>
+            <tr v-for="addr in addrs" :key="addr.id" v-show="addr.ReadOrWrite"
             :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
               <td>{{ addr.title }}</td>
@@ -104,7 +106,7 @@
                 </button>
               </td>
             </tr>
-          </tbody>
+          </draggable>
         </table>
       </div>
     </div>
@@ -157,6 +159,7 @@
 
 <script>
 import axios from 'axios';
+import draggable from 'vuedraggable';
 import Alert from './Alert';
 
 export default {
@@ -181,10 +184,12 @@ export default {
       },
       message: '',
       errorClass: 'bg-primary',
+      drag: false,
     };
   },
   components: {
     alert: Alert,
+    draggable,
   },
   methods: {
     getAddrs() {
@@ -219,7 +224,6 @@ export default {
       this.addAddrForm.str = [];
       this.addAddrForm.commit = '';
       this.addAddrForm.ReadOrWrite = [];
-      this.editForm.id = '';
       this.editForm.title = '';
       this.editForm.myvalue = '';
       this.editForm.bool = [];
@@ -300,6 +304,10 @@ export default {
     },
     checkclass(addr) {
       this.removeAddr(addr.id);
+    },
+    changeindex(evt) {
+      const path = 'http://localhost:5000/change';
+      axios.post(path, evt);
     },
   },
   created() {

@@ -37,6 +37,7 @@ def all_addrs():
     response_object = {'status': 'success'}
     if request.method == 'POST':
         post_data = request.get_json()
+            
         ADDRS.append({
             'id': uuid.uuid4().hex,
             'title': post_data.get('title'),
@@ -100,10 +101,10 @@ def single_addr(addr_id):
 
 @app.route('/save', methods=['POST'])
 def Save_Setting():
-    data = ADDRS
+    datas = ADDRS
     file = 'data.json'
     with open(file, 'w') as obj:
-        json.dump(data, obj)
+        json.dump(datas, obj)
     return "True"
 
 @app.route('/load', methods=['POST'])
@@ -117,9 +118,22 @@ def Load_Setting():
         ADDRS = []
     return "True"
 
+@app.route('/change', methods=['POST'])
+def change():
+    global ADDRS
+    post_data = request.get_json()
+    print()
+    old = post_data.get('moved')['oldIndex']
+    new = post_data.get('moved')['newIndex']
+    ADDRS[old], ADDRS[new] = ADDRS[new], ADDRS[old]
+    return "True"
+
+
 def remove_addr(addr_id):
+    print(ADDRS)
+    print(addr_id)
     for addr in ADDRS:
-        if addr['id'] == addr_id:
+        if addr['id'] == int(addr_id):
             ADDRS.remove(addr)
             return True
     return False
