@@ -6,7 +6,7 @@ import re
 import json
 
 rule = re.compile("B")
-rule1 = re.compile("DM")
+rule1 = re.compile("DM|W")
 
 socket = sock("192.168.5.88",8501)
 # socket = sock("192.168.10.10",8501)
@@ -60,7 +60,7 @@ def all_addrs():
             else:
                 strtype = rule1.findall(Addr['title'])
                 if len(strtype) > 0:
-                    status = socket.Get(Addr['title'],".U")
+                    status = socket.Get(Addr['title'],".D")
                     Addr['bool'] = False
                     Addr['str'] = True
                     Addr['myvalue'] = str(status)
@@ -133,7 +133,7 @@ def remove_addr(addr_id):
     print(ADDRS)
     print(addr_id)
     for addr in ADDRS:
-        if addr['id'] == int(addr_id):
+        if addr['id'] == addr_id:
             ADDRS.remove(addr)
             return True
     return False
