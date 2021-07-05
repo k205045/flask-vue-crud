@@ -17,6 +17,7 @@ class Mysocket():
         self.conn = socket(AF_INET, SOCK_STREAM)
         self.conn.connect((self.HOST, self.PORT))
         self.conn.settimeout(10)
+        self.is_number = re.compile("\d+")
         # self.Connect()
 
     # "RD ZF100.U"
@@ -34,47 +35,68 @@ class Mysocket():
 
 
     def Send(self, register, value, bit=''):
-        # cmd = "\x57\x52\x20\x5A\x46\x31\x30\x30\x2E\x44\x20\x38\x31\x35\x30\x30\x0D\x0A"
+            # cmd = "\x57\x52\x20\x5A\x46\x31\x30\x30\x2E\x44\x20\x38\x31\x35\x30\x30\x0D\x0A"
         cmd = "WR " + str(register) + bit + " " + str(value) + "\x0D"
-        print(cmd)
+        # print(cmd)
 
         self.conn.sendall(cmd.encode())
-        time.sleep(0.1)
-        return self.conn.recv(1024).decode()
+        # time.sleep(0.1)
+        try:
+            result = self.conn.recv(1024).decode().strip()
+        except:
+            return False
+        return result
 
-
-    def Sends(self, register, num,datas, bit=''):
+    def Sends(self, register, num, datas, bit=''):
         # cmd = "\x57\x52\x20\x5A\x46\x31\x30\x30\x2E\x44\x20\x38\x31\x35\x30\x30\x0D\x0A"
         self.__data = ""
         for x in datas:
-            self.__data += " "+ str(x)
+            self.__data += " " + str(x)
         # print(self.__data)
         cmd = "WRS " + str(register) + bit + " " + str(num) + self.__data + "\x0D"
         # print(cmd)
         self.conn.sendall(cmd.encode())
         # time.sleep(0.1)
-        return self.conn.recv(1024).decode()
+        try:
+            result = self.conn.recv(1024).decode().strip()
+        except:
+            return False
+        return result
 
-
-
-    def Get(self, register, bit=''):
+    def Get(self, register, bit='', logout= False):
         # cmd = "\x52\x44\x20\x5A\x46\x31\x30\x30\2E\55\x0D\x0A"
-        cmd = "RD " + register + str(bit) +"\x0D"
+        cmd = "RD " + register + str(bit) + "\x0D"
         # print(cmd.encode())
         self.conn.sendall(cmd.encode())
-        # a =
-        # print(a)
-        return self.conn.recv(1024).decode().strip()
+        try:
+            result = self.conn.recv(1024).decode().strip()
+        except:
+            return False
+        if len(self.is_number.findall(result)) > 0:
+            result = int(result)
+        else:
+            return False
 
+        if logout == True:
+            print(result)
+        return result
 
     def Gets(self, register, nums, bit=''):
         # cmd = "\x52\x44\x20\x5A\x46\x31\x30\x30\2E\55\x0D\x0A"
-        cmd = "RDS " + register + bit + ' ' + str(nums) +"\x0D"
+        cmd = "RDS " + register + bit + ' ' + str(nums) + "\x0D"
         # print(cmd.encode())
 
         self.conn.sendall(cmd.encode())
         self.__list = []
-        [self.__list.append(int(x)) for x in self.conn.recv(1024).decode().strip().split(" ")]
+        try:
+            result = self.conn.recv(1024).decode().strip()
+        except:
+            return False
+        if len(self.is_number.findall(result)) > 0:
+            [self.__list.append(int(x)) for x in self.conn.recv(1024).decode().strip().split(" ")]
+        else:
+            return False
+
         return self.__list
 
     
