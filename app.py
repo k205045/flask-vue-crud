@@ -8,8 +8,8 @@ import json
 rule = re.compile("B")
 rule1 = re.compile("DM|W")
 
-socket = sock("192.168.5.88",8501)
-# socket = sock("192.168.10.10",8501)
+# socket = sock("192.168.5.88",8501)
+socket = sock("192.168.10.10",8501)
 # configuration
 DEBUG = True
 

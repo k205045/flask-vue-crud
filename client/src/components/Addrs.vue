@@ -37,13 +37,13 @@
                 <span v-else>No</span>
               </td>
               <td>
-                <!-- <button
+                <button
                     type="button"
                     class="btn btn-warning btn-sm"
-                    v-b-modal.addr-update-modal
+                    v-b-modal.addr-update-modal-2
                     @click="editAddr(addr)">
                     Update
-                </button> -->
+                </button>
                 <button
                     type="button"
                     class="btn btn-danger btn-sm"
@@ -150,6 +150,50 @@
             <b-form-checkbox myvalue="true">status </b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
+        <b-button type="submit" variant="primary">Update</b-button>
+        <b-button type="reset" variant="danger">Cancel</b-button>
+      </b-form>
+    </b-modal>
+    <b-modal ref="editAddrModal"
+            id="addr-update-modal-2"
+            title="Update"
+            hide-footer>
+      <b-form @submit="onSubmitUpdate" @reset="onResetUpdate" class="w-100">
+      <b-form-group id="form-title-edit-group"
+                    label="Commit:"
+                    label-for="form-title-edit-input">
+          <b-form-input id="form-title-edit-input"
+                        type="text"
+                        v-model="editForm.commit"
+                        required
+                        placeholder="Enter commit">
+          </b-form-input>
+        </b-form-group>
+      <b-form-group id="form-title-edit-group"
+                    label="Title:"
+                    label-for="form-title-edit-input">
+          <b-form-input id="form-title-edit-input"
+                        type="text"
+                        v-model="editForm.title"
+                        required
+                        placeholder="Enter title">
+          </b-form-input>
+        </b-form-group>
+        <!-- <b-form-group v-if="editForm.str" id="form-myvalue-edit-group"
+                      label="myvalue:"
+                      label-for="form-myvalue-edit-input">
+            <b-form-input id="form-myvalue-edit-input"
+                          type="text"
+                          v-model="editForm.myvalue"
+                          required
+                          placeholder="Enter myvalue">
+            </b-form-input>
+          </b-form-group>
+        <b-form-group v-if="!editForm.str" id="form-bool-edit-group">
+          <b-form-checkbox-group v-model="editForm.bool" id="form-checks">
+            <b-form-checkbox myvalue="true">status </b-form-checkbox>
+          </b-form-checkbox-group>
+        </b-form-group> -->
         <b-button type="submit" variant="primary">Update</b-button>
         <b-button type="reset" variant="danger">Cancel</b-button>
       </b-form>

@@ -81,8 +81,8 @@ class Mysocket():
 
 
 if __name__ == '__main__':
-    a = Mysocket("127.0.0.1",5890)
-    print(a.Get("DM0",".U"))
+    a = Mysocket("192.168.10.10",8501)
+    print(a.Get("W300"))
     pass
     #  .U : 16位無符號十進位
     #  .S : 16位有符號十進位
