@@ -9,7 +9,7 @@ rule = re.compile("B")
 rule1 = re.compile("DM|W")
 
 # socket = sock("192.168.5.88",8501)
-socket = sock("192.168.162.20",8501)
+# socket = sock("192.168.162.20",8501)
 # configuration
 DEBUG = True
 
@@ -52,7 +52,8 @@ def all_addrs():
         for Addr in ADDRS:
             Booltype = rule.findall(Addr['title'])
             if len(Booltype) > 0:
-                status = tobool(socket.Get(Addr['title']))
+                status = ""
+                # status = tobool(socket.Get(Addr['title']))
                 Addr['bool'] = status
                 Addr['str'] = False
                 Addr['myvalue'] = ""
@@ -62,7 +63,8 @@ def all_addrs():
             else:
                 strtype = rule1.findall(Addr['title'])
                 if len(strtype) > 0:
-                    status = socket.Get(Addr['title'],".D")
+                    status = ""
+                    # status = socket.Get(Addr['title'],".D")
                     Addr['bool'] = False
                     Addr['str'] = True
                     Addr['myvalue'] = str(status)
@@ -75,16 +77,21 @@ def single_addr(addr_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
         post_data = request.get_json()
+        for i in range(len(ADDRS)):
+            if ADDRS[i]["id"] == addr_id:
+                index_1 = i
+                break
         remove_addr(addr_id)
-        ADDRS.append({
+        ADDRS.insert(index_1 ,{
             'id': uuid.uuid4().hex,
             'title': post_data.get('title'),
             'bool': post_data.get('bool'),
             'str' : post_data.get('str'),
-            'value' : post_data.get('value'),
+            'myvalue' : post_data.get('myvalue'),
             'commit' : post_data.get('commit'),
             'ReadOrWrite':post_data.get('ReadOrWrite')
         })
+        
         # print(post_data.get('title'))
         Booltype = rule.findall(post_data.get('title'))
         if len(Booltype) > 0:
@@ -124,7 +131,6 @@ def Load_Setting():
 def change():
     global ADDRS
     post_data = request.get_json()
-    print()
     old = post_data.get('moved')['oldIndex']
     new = post_data.get('moved')['newIndex']
     ADDRS[old], ADDRS[new] = ADDRS[new], ADDRS[old]
@@ -132,8 +138,8 @@ def change():
 
 
 def remove_addr(addr_id):
-    print(ADDRS)
-    print(addr_id)
+    # print(ADDRS)
+    # print(addr_id)
     for addr in ADDRS:
         if addr['id'] == addr_id:
             ADDRS.remove(addr)
@@ -149,7 +155,7 @@ def tobool(bool):
             return "Error"
 
 def tostr(str):
-        print(str)
+        # print(str)
         if str:
             return "1"
         else:

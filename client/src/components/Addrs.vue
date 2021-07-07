@@ -4,7 +4,6 @@
       <div class="col-6">
         <h2>Only Read</h2>
         <br>
-        <!-- <alert :message=message v-if="showMessage"></alert> -->
         <div class="col-lg-6">
           <div class="input-group">
             <input v-model="commit1" class="form-control" placeholder="注釋">
@@ -22,7 +21,7 @@
               <th scope="col">注釋</th>
               <th scope="col">暫存器</th>
               <th scope="col">狀態</th>
-              <th></th>
+              <th scope="col">位元</th>
             </tr>
           </thead>
           <draggable v-model="addrs" tag="tbody" animation="500"
@@ -76,7 +75,7 @@
               <th scope="col">注釋</th>
               <th scope="col">暫存器</th>
               <th scope="col">狀態</th>
-              <th></th>
+              <th scope="col">位元</th>
             </tr>
           </thead>
           <draggable v-model="addrs" tag="tbody" animation="500"
@@ -90,6 +89,12 @@
                 <span v-else-if="addr.str" >{{addr.myvalue}}</span>
                 <span v-else>No</span>
               </td>
+              <select v-model="selected" class="">
+                <option selected>A</option>
+                <option>B</option>
+                <option>C</option>
+              </select>
+              <!-- <span>Selected: {{ selected }}</span> -->
               <td>
                 <button
                     type="button"
