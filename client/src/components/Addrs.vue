@@ -1,5 +1,11 @@
 <template>
   <div class="container-fluid">
+    <div class="mt-3">
+      <b-button-group>
+        <b-button type="button" @click="timerON()" variant="success">開啟掃描</b-button>
+        <b-button type="button" @click="timerOFF()" variant="info">關閉掃描</b-button>
+      </b-button-group>
+    </div>
     <div class="row">
       <div class="col-6">
         <h2>Only Read</h2>
@@ -22,12 +28,13 @@
               <th scope="col">暫存器</th>
               <th scope="col">狀態</th>
               <th scope="col">位元</th>
+              <th scope="col">操作</th>
             </tr>
           </thead>
-          <draggable v-model="addrs" tag="tbody" animation="500"
-          chosen-class="chosen" @change=changeindex>
+          <draggable class="text-align:center" tag="tbody" animation="500"
+            chosen-class="chosen" @change=changeindex>
             <tr v-for="addr in addrs" :key="addr.id" v-show="!addr.ReadOrWrite"
-            :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
+            :class="[{ 'table-success': addr.bool , 'table-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
               <td>{{ addr.title }}</td>
               <td>
@@ -36,16 +43,25 @@
                 <span v-else>No</span>
               </td>
               <td>
+                <select name="public-choice"
+                  :value="addr.selectnum"
+                  class="btn table-dark dropdown-toggle">
+                  <option :value="coupon.id" v-for="coupon in couponList" :key="coupon">
+                    {{coupon.name}}
+                  </option>
+                </select>
+              </td>
+              <td>
                 <button
                     type="button"
-                    class="btn btn-warning btn-sm"
+                    class="btn table-warning btn-sm"
                     v-b-modal.addr-update-modal-2
                     @click="editAddr(addr)">
                     Update
                 </button>
                 <button
                     type="button"
-                    class="btn btn-danger btn-sm"
+                    class="btn table-danger btn-sm"
                     @click="onDeleteAddr(addr)">
                     Delete
                 </button>
@@ -75,13 +91,14 @@
               <th scope="col">注釋</th>
               <th scope="col">暫存器</th>
               <th scope="col">狀態</th>
-              <th scope="col">位元</th>
+              <th scope="col">  位元</th>
+              <th scope="col">操作</th>
             </tr>
           </thead>
           <draggable v-model="addrs" tag="tbody" animation="500"
           chosen-class="chosen" @change=changeindex>
             <tr v-for="addr in addrs" :key="addr.id" v-show="addr.ReadOrWrite"
-            :class="[{ 'bg-success': addr.bool , 'bg-info':addr.str }, errorClass]">
+            :class="[{ 'table-success': addr.bool , 'table-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
               <td>{{ addr.title }}</td>
               <td>
@@ -90,16 +107,25 @@
                 <span v-else>No</span>
               </td>
               <td>
+                <select name="public-choice"
+                  @change="getCouponSelected" :value="addr.selectnum"
+                  class="btn table-dark dropdown-toggle">
+                  <option :value="coupon.id" v-for="coupon in couponList" :key="coupon">
+                    {{coupon.name}}
+                  </option>
+                </select>
+              </td>
+              <td>
                 <button
                     type="button"
-                    class="btn btn-warning btn-sm"
+                    class="btn table-warning btn-sm"
                     v-b-modal.addr-update-modal
                     @click="editAddr(addr)">
                     Update
                 </button>
                 <button
                     type="button"
-                    class="btn btn-danger btn-sm"
+                    class="btn table-danger btn-sm"
                     @click="onDeleteAddr(addr)">
                     Delete
                 </button>
@@ -149,6 +175,15 @@
             <b-form-checkbox myvalue="true">status </b-form-checkbox>
           </b-form-checkbox-group>
         </b-form-group>
+        <b-form-group id="form-title-edit-group"
+                    label="bit:"
+                    label-for="form-title-edit-select">
+          <b-form-select v-model="editForm.selectnum"
+            required
+            :options="bcouponList"
+            placeholder="Enter select">
+          </b-form-select>
+        </b-form-group>
         <b-button type="submit" variant="primary">Update</b-button>
         <b-button type="reset" variant="danger">Cancel</b-button>
       </b-form>
@@ -178,21 +213,15 @@
                         placeholder="Enter title">
           </b-form-input>
         </b-form-group>
-        <!-- <b-form-group v-if="editForm.str" id="form-myvalue-edit-group"
-                      label="myvalue:"
-                      label-for="form-myvalue-edit-input">
-            <b-form-input id="form-myvalue-edit-input"
-                          type="text"
-                          v-model="editForm.myvalue"
-                          required
-                          placeholder="Enter myvalue">
-            </b-form-input>
-          </b-form-group>
-        <b-form-group v-if="!editForm.str" id="form-bool-edit-group">
-          <b-form-checkbox-group v-model="editForm.bool" id="form-checks">
-            <b-form-checkbox myvalue="true">status </b-form-checkbox>
-          </b-form-checkbox-group>
-        </b-form-group> -->
+        <b-form-group id="form-title-edit-group"
+                    label="bit:"
+                    label-for="form-title-edit-select">
+          <b-form-select v-model="editForm.selectnum"
+            required
+            :options="bcouponList"
+            placeholder="Enter select">
+          </b-form-select>
+        </b-form-group>
         <b-button type="submit" variant="primary">Update</b-button>
         <b-button type="reset" variant="danger">Cancel</b-button>
       </b-form>
@@ -209,8 +238,51 @@ import Alert from './Alert';
 export default {
   data() {
     return {
-      selected: null,
-      options: ['list', 'of', 'options'],
+      couponList: [
+        {
+          id: '0',
+          name: '布林',
+        },
+        {
+          id: '1',
+          name: '無符號16進位',
+        },
+        {
+          id: '2',
+          name: '有符號16進位',
+        },
+        {
+          id: '3',
+          name: '無符號32進位',
+        },
+        {
+          id: '4',
+          name: '有符號32進位',
+        },
+      ],
+      couponSelected: '',
+      bcouponList: [{
+        value: '0',
+        text: '布林',
+      },
+      {
+        value: '1',
+        text: '無符號16進位',
+      },
+      {
+        value: '2',
+        text: '有符號16進位',
+      },
+      {
+        value: '3',
+        text: '無符號32進位',
+      },
+      {
+        value: '4',
+        text: '有符號32進位',
+      },
+      ],
+      bcouponSelected: '',
       addrs: [],
       addAddrForm: {
         title: '',
@@ -219,6 +291,7 @@ export default {
         myvalue: '',
         commit: '',
         ReadOrWrite: [],
+        selectnum: 0,
       },
       editForm: {
         title: '',
@@ -227,9 +300,10 @@ export default {
         myvalue: '',
         commit: '',
         ReadOrWrite: [],
+        selectnum: 0,
       },
       message: '',
-      errorClass: 'bg-primary',
+      errorClass: 'table-primary',
       drag: false,
     };
   },
@@ -269,6 +343,7 @@ export default {
       this.addAddrForm.bool = [];
       this.addAddrForm.str = [];
       this.addAddrForm.commit = '';
+      this.addAddrForm.selectnum = '0';
       this.addAddrForm.ReadOrWrite = [];
       this.editForm.title = '';
       this.editForm.myvalue = '';
@@ -276,8 +351,9 @@ export default {
       this.editForm.str = [];
       this.editForm.commit = '';
       this.editForm.ReadOrWrite = [];
+      this.editForm.selectnum = '0';
     },
-    onSubmit(addr, commit1, read) {
+    onSubmit(addr, commit1, read, bit) {
       // this.$refs.addAddrModal.hide();
       let bool = false;
       if (this.addAddrForm.bool[0]) bool = true;
@@ -286,6 +362,7 @@ export default {
         title: addr,
         bool, // property shorthand
         ReadOrWrite: read,
+        selectnum: bit,
       };
       this.addAddr(payload);
       this.initForm();
@@ -308,6 +385,7 @@ export default {
         myvalue: this.editForm.myvalue,
         commit: this.editForm.commit,
         ReadOrWrite: this.editForm.ReadOrWrite,
+        selectnum: this.editForm.selectnum,
       };
       this.updateAddr(payload, this.editForm.id);
     },
@@ -355,8 +433,16 @@ export default {
       const path = 'http://localhost:5000/change';
       axios.post(path, evt);
     },
+    timerON() {
+      this.timer = setInterval(this.getAddrs, 1000);
+    },
+    timerOFF() {
+      clearInterval(this.timer);
+    },
   },
   created() {
+    this.couponSelected = this.couponList[0].id;
+    this.bcouponSelected = this.bcouponList[0];
     this.getAddrs();
     this.timer = setInterval(this.getAddrs, 1000);
     // clearInterval(this.timer);

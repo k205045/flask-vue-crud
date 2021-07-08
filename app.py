@@ -9,8 +9,8 @@ rule = re.compile("B")
 rule1 = re.compile("DM|W")
 
 # socket = sock("192.168.5.88",8501)
-# socket = sock("192.168.162.20",8501)
-socket = sock("192.168.10.10",8501)
+socket = sock("192.168.162.40",8501)
+# socket = sock("192.168.10.10",8501)
 # configuration
 DEBUG = True
 
@@ -46,7 +46,8 @@ def all_addrs():
             'str': False,
             'myvalue' : "",
             'commit' : post_data.get('commit'),
-            'ReadOrWrite':post_data.get('ReadOrWrite')
+            'ReadOrWrite':post_data.get('ReadOrWrite'),
+            'selectnum':"0"
         })
         response_object['message'] = 'address added!'
     else:
@@ -54,18 +55,18 @@ def all_addrs():
             Booltype = rule.findall(Addr['title'])
             if len(Booltype) > 0:
                 status = ""
-                status = tobool(socket.Get(Addr['title']))
+                status = tobool(socket.Get(Addr['title'],Addr['selectnum']))
                 Addr['bool'] = status
                 Addr['str'] = False
                 Addr['myvalue'] = ""
                 # print(Addr['title'])
-                # print(socket.Get(Addr['title']))
+                # print(socket.Get(Addr['title'],Addr['selectnum']))
                 # print("--------------")
             else:
                 strtype = rule1.findall(Addr['title'])
                 if len(strtype) > 0:
                     status = ""
-                    status = socket.Get(Addr['title'],".D")
+                    status = socket.Get(Addr['title'],Addr['selectnum'])#.D
                     Addr['bool'] = False
                     Addr['str'] = True
                     Addr['myvalue'] = str(status)
@@ -78,6 +79,8 @@ def single_addr(addr_id):
     response_object = {'status': 'success'}
     if request.method == 'PUT':
         post_data = request.get_json()
+        print(post_data.get('selectnum'))
+        index_1 = int
         for i in range(len(ADDRS)):
             if ADDRS[i]["id"] == addr_id:
                 index_1 = i
@@ -90,18 +93,19 @@ def single_addr(addr_id):
             'str' : post_data.get('str'),
             'myvalue' : post_data.get('myvalue'),
             'commit' : post_data.get('commit'),
-            'ReadOrWrite':post_data.get('ReadOrWrite')
+            'ReadOrWrite':post_data.get('ReadOrWrite'),
+            'selectnum':post_data.get('selectnum')
         })
         
         # print(post_data.get('title'))
         Booltype = rule.findall(post_data.get('title'))
         if len(Booltype) > 0:
-            socket.Send(post_data.get('title'), tostr(post_data.get('bool')))
+            socket.Send(post_data.get('title'), tostr(post_data.get('bool')), post_data.get('selectnum'))
             # print("bool1111111111111")
         else:
             strtype = rule1.findall(post_data.get('title'))
             if len(strtype) > 0:
-                socket.Send(post_data.get('title'), post_data.get('myvalue'),".U")
+                socket.Send(post_data.get('title'), post_data.get('myvalue'), post_data.get('selectnum'))#.U
         
         response_object['message'] = 'addr updated!'
     if request.method == 'DELETE':

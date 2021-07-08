@@ -14,10 +14,12 @@ class Mysocket():
         self.logger = self.k.Getlogger(__name__)
         self.HOST = host
         self.PORT = port
-        self.conn = socket(AF_INET, SOCK_STREAM)
+        # self.conn = socket(AF_INET, SOCK_STREAM)
+        self.conn = socket(AF_INET,SOCK_DGRAM)
         self.conn.connect((self.HOST, self.PORT))
         self.conn.settimeout(10)
         self.is_number = re.compile("\d+")
+        self.bit = {'0':"",'1':".U",'2':".S",'3':".D",'4':".L"}
         # self.Connect()
 
     # "RD ZF100.U"
@@ -36,7 +38,7 @@ class Mysocket():
 
     def Send(self, register, value, bit=''):
             # cmd = "\x57\x52\x20\x5A\x46\x31\x30\x30\x2E\x44\x20\x38\x31\x35\x30\x30\x0D\x0A"
-        cmd = "WR " + str(register) + bit + " " + str(value) + "\x0D"
+        cmd = "WR " + str(register) + self.bit[bit] + " " + str(value) + "\x0D"
         # print(cmd)
 
         self.conn.sendall(cmd.encode())
@@ -53,7 +55,7 @@ class Mysocket():
         for x in datas:
             self.__data += " " + str(x)
         # print(self.__data)
-        cmd = "WRS " + str(register) + bit + " " + str(num) + self.__data + "\x0D"
+        cmd = "WRS " + str(register) + self.bit[bit] + " " + str(num) + self.__data + "\x0D"
         # print(cmd)
         self.conn.sendall(cmd.encode())
         # time.sleep(0.1)
@@ -65,7 +67,7 @@ class Mysocket():
 
     def Get(self, register, bit='', logout= False):
         # cmd = "\x52\x44\x20\x5A\x46\x31\x30\x30\2E\55\x0D\x0A"
-        cmd = "RD " + register + str(bit) + "\x0D"
+        cmd = "RD " + register + self.bit[bit] + "\x0D"
         # print(cmd.encode())
         self.conn.sendall(cmd.encode())
         try:
@@ -83,7 +85,7 @@ class Mysocket():
 
     def Gets(self, register, nums, bit=''):
         # cmd = "\x52\x44\x20\x5A\x46\x31\x30\x30\2E\55\x0D\x0A"
-        cmd = "RDS " + register + bit + ' ' + str(nums) + "\x0D"
+        cmd = "RDS " + register + self.bit[bit] + ' ' + str(nums) + "\x0D"
         # print(cmd.encode())
 
         self.conn.sendall(cmd.encode())
@@ -103,11 +105,12 @@ class Mysocket():
 
 
 if __name__ == '__main__':
-    a = Mysocket("192.168.10.10",8501)
-    print(a.Get("W300"))
+    a = Mysocket("192.168.162.40",8501)
+    print(a.Get("W500","2"))
     pass
     #  .U : 16位無符號十進位
     #  .S : 16位有符號十進位
     #  .D : 32位無符號十進位
     #  .L : 32位有符號十進位
     #  .H : 16位十六進位值數
+    
