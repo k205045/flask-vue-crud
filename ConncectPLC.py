@@ -105,9 +105,12 @@ class Mysocket():
 
 
 if __name__ == '__main__':
-    a = Mysocket("192.168.162.40",8501)
-    print(a.Get("W500","2"))
-    pass
+    a = Mysocket("192.168.10.10",8501)
+    while True:
+        time.sleep(1)
+        a.Send("W308","100","3")
+        time.sleep(1)
+        a.Send("W308","200","3")
     #  .U : 16位無符號十進位
     #  .S : 16位有符號十進位
     #  .D : 32位無符號十進位

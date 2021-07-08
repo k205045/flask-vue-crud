@@ -43,13 +43,7 @@
                 <span v-else>No</span>
               </td>
               <td>
-                <select name="public-choice"
-                  :value="addr.selectnum"
-                  class="btn table-dark dropdown-toggle">
-                  <option :value="coupon.id" v-for="coupon in couponList" :key="coupon">
-                    {{coupon.name}}
-                  </option>
-                </select>
+                {{ bcouponList[addr.selectnum].text }}
               </td>
               <td>
                 <button
@@ -107,13 +101,7 @@
                 <span v-else>No</span>
               </td>
               <td>
-                <select name="public-choice"
-                  @change="getCouponSelected" :value="addr.selectnum"
-                  class="btn table-dark dropdown-toggle">
-                  <option :value="coupon.id" v-for="coupon in couponList" :key="coupon">
-                    {{coupon.name}}
-                  </option>
-                </select>
+                {{ bcouponList[addr.selectnum].text }}
               </td>
               <td>
                 <button
@@ -238,29 +226,6 @@ import Alert from './Alert';
 export default {
   data() {
     return {
-      couponList: [
-        {
-          id: '0',
-          name: '布林',
-        },
-        {
-          id: '1',
-          name: '無符號16進位',
-        },
-        {
-          id: '2',
-          name: '有符號16進位',
-        },
-        {
-          id: '3',
-          name: '無符號32進位',
-        },
-        {
-          id: '4',
-          name: '有符號32進位',
-        },
-      ],
-      couponSelected: '',
       bcouponList: [{
         value: '0',
         text: '布林',
@@ -291,7 +256,7 @@ export default {
         myvalue: '',
         commit: '',
         ReadOrWrite: [],
-        selectnum: 0,
+        selectnum: '',
       },
       editForm: {
         title: '',
@@ -300,7 +265,7 @@ export default {
         myvalue: '',
         commit: '',
         ReadOrWrite: [],
-        selectnum: 0,
+        selectnum: '',
       },
       message: '',
       errorClass: 'table-primary',
@@ -317,6 +282,8 @@ export default {
       axios.get(path)
         .then((res) => {
           this.addrs = res.data.addrs;
+          // eslint-disable-next-line
+          console.log(this.addrs);
         })
         .catch((error) => {
           // eslint-disable-next-line
