@@ -10,6 +10,7 @@ rule1 = re.compile("DM|W")
 
 # socket = sock("192.168.5.88",8501)
 # socket = sock("192.168.162.20",8501)
+socket = sock("192.168.10.10",8501)
 # configuration
 DEBUG = True
 
@@ -53,7 +54,7 @@ def all_addrs():
             Booltype = rule.findall(Addr['title'])
             if len(Booltype) > 0:
                 status = ""
-                # status = tobool(socket.Get(Addr['title']))
+                status = tobool(socket.Get(Addr['title']))
                 Addr['bool'] = status
                 Addr['str'] = False
                 Addr['myvalue'] = ""
@@ -64,7 +65,7 @@ def all_addrs():
                 strtype = rule1.findall(Addr['title'])
                 if len(strtype) > 0:
                     status = ""
-                    # status = socket.Get(Addr['title'],".D")
+                    status = socket.Get(Addr['title'],".D")
                     Addr['bool'] = False
                     Addr['str'] = True
                     Addr['myvalue'] = str(status)

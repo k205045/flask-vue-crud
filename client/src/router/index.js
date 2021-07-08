@@ -4,7 +4,9 @@ import Addrs from '@/components/Addrs';
 import Login from '@/components/Login';
 import Header from '@/components/Header';
 import UserInfo from '@/components/UserInfo';
+import vSelect from 'vue-select';
 
+Vue.component('v-select', vSelect);
 Vue.use(Router);
 
 export default new Router({

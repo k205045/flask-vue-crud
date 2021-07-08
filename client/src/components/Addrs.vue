@@ -89,12 +89,6 @@
                 <span v-else-if="addr.str" >{{addr.myvalue}}</span>
                 <span v-else>No</span>
               </td>
-              <select v-model="selected" class="">
-                <option selected>A</option>
-                <option>B</option>
-                <option>C</option>
-              </select>
-              <!-- <span>Selected: {{ selected }}</span> -->
               <td>
                 <button
                     type="button"
@@ -207,6 +201,7 @@
 </template>
 
 <script>
+import 'vue-select/dist/vue-select.css';
 import axios from 'axios';
 import draggable from 'vuedraggable';
 import Alert from './Alert';
@@ -214,6 +209,8 @@ import Alert from './Alert';
 export default {
   data() {
     return {
+      selected: null,
+      options: ['list', 'of', 'options'],
       addrs: [],
       addAddrForm: {
         title: '',
