@@ -6,6 +6,8 @@
         <b-button type="button" @click="timerOFF()" variant="info">關閉掃描</b-button>
       </b-button-group>
     </div>
+    <br>
+    <alert :message=message v-if="showMessage"></alert>
     <div class="row">
       <div class="col-6">
         <h2>Only Read</h2>
@@ -20,7 +22,7 @@
             </span>
           </div>
         </div>
-        <br><br>
+        <br>
         <table class="table table-hover">
           <thead>
             <tr>
@@ -31,8 +33,8 @@
               <th scope="col">操作</th>
             </tr>
           </thead>
-          <draggable class="text-align:center" tag="tbody" animation="500"
-            chosen-class="chosen" @change=changeindex>
+          <draggable v-model="addrs" tag="tbody" animation="500"
+          chosen-class="chosen" @change=changeindex>
             <tr v-for="addr in addrs" :key="addr.id" v-show="!addr.ReadOrWrite"
             :class="[{ 'table-success': addr.bool , 'table-info':addr.str }, errorClass]">
               <td>{{ addr.commit }}</td>
@@ -67,7 +69,6 @@
       <div class="col-6">
         <h2>Read and Write</h2>
         <br>
-        <!-- <alert :message=message v-if="showMessage"></alert> -->
         <div class="col-lg-6">
           <div class="input-group">
             <input v-model="commit2" class="form-control" placeholder="注釋">
@@ -78,7 +79,7 @@
             </span>
           </div>
         </div>
-        <br><br>
+        <br>
         <table class="table table-hover">
           <thead>
             <tr>
@@ -268,6 +269,7 @@ export default {
         selectnum: '',
       },
       message: '',
+      showMessage: false,
       errorClass: 'table-primary',
       drag: false,
     };
@@ -282,8 +284,6 @@ export default {
       axios.get(path)
         .then((res) => {
           this.addrs = res.data.addrs;
-          // eslint-disable-next-line
-          console.log(this.addrs);
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -295,8 +295,6 @@ export default {
       axios.post(path, payload)
         .then(() => {
           this.getAddrs();
-          this.message = 'addr added!';
-          this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -361,8 +359,6 @@ export default {
       axios.put(path, payload)
         .then(() => {
           this.getAddrs();
-          this.message = 'Addr updated!';
-          this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -381,8 +377,6 @@ export default {
       axios.delete(path)
         .then(() => {
           this.getAddrs();
-          this.message = 'Addr removed!';
-          this.showMessage = true;
         })
         .catch((error) => {
           // eslint-disable-next-line
@@ -401,17 +395,19 @@ export default {
       axios.post(path, evt);
     },
     timerON() {
-      this.timer = setInterval(this.getAddrs, 1000);
+      this.timer = setInterval(this.getAddrs, 500);
+      this.showMessage = false;
     },
     timerOFF() {
       clearInterval(this.timer);
+      this.message = '停止刷新!';
+      this.showMessage = true;
     },
   },
   created() {
-    this.couponSelected = this.couponList[0].id;
     this.bcouponSelected = this.bcouponList[0];
     this.getAddrs();
-    this.timer = setInterval(this.getAddrs, 1000);
+    this.timer = setInterval(this.getAddrs, 500);
     // clearInterval(this.timer);
   },
 };
