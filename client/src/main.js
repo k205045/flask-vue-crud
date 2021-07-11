@@ -19,16 +19,3 @@ new Vue({
   components: { App },
   template: '<App/>',
 });
-
-router.beforeEach((to, from, next) => {
-  const isLogin = localStorage.getItem('token') === 'ImLogin';
-  if (isLogin) {
-    next();
-  } else {
-    if (to.path !== '/') {
-      next('/');
-    } else {
-      next();
-    }
-  }
-});

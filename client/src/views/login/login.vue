@@ -16,7 +16,7 @@
             <form @submit.prevent="login" class="login-form">
               <div class="form-group">
                 <input type="text" class="form-control rounded-left" placeholder="userName"
-                v-model="username" required>
+                v-model="userName" required>
               </div>
               <div class="form-group d-flex">
                 <input type="password" class="form-control rounded-left" placeholder="password"
@@ -35,26 +35,12 @@
 </template>
 
 <script>
-// eslint-disable-next-line
-import { setCookie, getCookie } from '../../assets/jcode/cookie';
-
-export default{
+export default {
   data() {
     return {
-      username: '',
+      userName: '',
       password: '',
-      newUsername: '',
-      newPassword: '',
-      tishi: '',
-      showTishi: false,
-      showLogin: true,
-      showRegister: false,
     };
-  },
-  mounted() {
-    if (getCookie('username')) {
-      this.$router.push('/home');
-    }
   },
   methods: {
     login() {
@@ -69,21 +55,13 @@ export default{
           // eslint-disable-next-line
           console.log(res.data);
           // eslint-disable-next-line
-            console.log(typeof res.data);
-          if (res.data === -1) {
-            this.tishi = ' 該使用者不存在';
-            this.showTishi = true;
-          } else if (res.data === 0) {
-            this.tishi = '密碼輸入錯誤';
-            this.showTishi = true;
+          console.log(typeof res.data);
+          if (res.data === 0) {
+            // eslint-disable-next-line
+            alert('login failed');
           } else {
-            this.tishi = '登入成功';
-            this.showTishi = true;
-            setCookie('username', this.username, 1000 * 60);
-            setTimeout(() => {
-              this.$router.push('/home');
-              this.$router.go(0);
-            }, 100);
+            localStorage.setItem('token', 'ImLogin');
+            this.$router.replace({ name: 'Home' });
           }
         });
       }
@@ -91,38 +69,3 @@ export default{
   },
 };
 </script>
-
-<style>
-  .login-wrap{text-align:center;}
-  input{
-    display:block;
-    width:250px;
-    height:40px;
-    line-height:40px;
-    margin:0 auto;
-    margin-bottom: 10px;
-    outline:none;
-    border:1px
-    solid #888;
-    padding:10px;
-    box-sizing:border-box;
-  }
-  p{color:red;}
-  button{
-    display:block;
-    width:250px;
-    height:40px;
-    line-height:
-    40px;
-    margin:0
-    auto;
-    border:none;
-    background-color:#41b883;
-    color:#fff;
-    font-size:16px;
-    margin-bottom:5px;
-  }
-  span{cursor:pointer;}
-  span:hover{color:#41b883;}
-</style>
-
