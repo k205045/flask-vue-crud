@@ -27,11 +27,13 @@
 </template>
 <script>
 import axios from 'axios';
+import { delCookie } from '../assets/jcode/cookie';
 
 export default {
   methods: {
     logout() {
-      localStorage.removeItem('token');
+      // localStorage.removeItem('token');
+      delCookie('username');
       this.$router.push('/');
     },
     Save() {

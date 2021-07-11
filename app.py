@@ -4,6 +4,7 @@ from ConncectPLC import Mysocket as sock
 import uuid
 import re
 import json
+import sys
 
 rule = re.compile("B")
 rule1 = re.compile("DM|W")
@@ -19,7 +20,7 @@ app = Flask(__name__)
 app.config.from_object(__name__)
 
 # enable CORS
-CORS(app)
+CORS(app, supports_credentials=True)
 
 try:
     ADDRS = json.load(open( "data.json"))
@@ -141,6 +142,25 @@ def change():
     ADDRS[old], ADDRS[new] = ADDRS[new], ADDRS[old]
     return "True"
 
+@app.route("/login", methods=['POST'])
+def login():
+    if request.method == 'POST' and request.form.get('username') and request.form.get('password'):
+        datax = request.form.to_dict()
+        usernamx = datax.get("username")
+        passwordx = datax.get("password")
+        setaccount = "admin"
+        setpassword = "admin"
+        print(usernamx,passwordx)
+        if passwordx != setpassword:
+            print("0")
+            return "0"
+        elif usernamx == setaccount and passwordx == setpassword:
+            print(setaccount)
+            return setaccount
+        else:
+            return "1"
+    else:
+        return "fail"
 
 def remove_addr(addr_id):
     # print(ADDRS)

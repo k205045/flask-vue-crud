@@ -222,7 +222,7 @@
 import 'vue-select/dist/vue-select.css';
 import axios from 'axios';
 import draggable from 'vuedraggable';
-import Alert from './Alert';
+import Alert from '../../components/Alert';
 
 export default {
   data() {
@@ -370,7 +370,7 @@ export default {
       evt.preventDefault();
       this.$refs.editAddrModal.hide();
       this.initForm();
-      this.getAddrs(); // why?
+      this.getAddrs();
     },
     removeAddr(addrID) {
       const path = `http://localhost:5000/addrs/${addrID}`;
